@@ -22,18 +22,16 @@ func main() {
 
 	flags := f.ParseFlags()
 
-	if flags.Version {
-		log.Info("Gonesis " + colors.Magenta + "v1.0.0")
-		fmt.Printf("\n")
-		os.Exit(0)
-  }
-
   if flags.NewProject != "" {
 		log.Info("Creating project " + flags.NewProject)
 		app.CreateProject(flags.NewProject)
 		fmt.Printf("\n")
+
+		log.Success("Project created!\n")
+
+		fmt.Println(colors.Green +  " • " + colors.Reset + "Run " + colors.Cyan + "cd " + flags.NewProject + colors.Reset + " and " + colors.Cyan + "make run" + colors.Reset + " to start the server.\n")
+
 		os.Exit(0)
-		// log.Success("Project created! Run " + colors.Magenta + "cd " + flags.NewProject + colors.Reset + " and " colors.M" to start working on it")
   }
 
 }
