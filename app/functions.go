@@ -34,6 +34,10 @@ func CreateProject(name string) {
   CreateFile("Makefile", GetMakefileContent(name))
   log.Info("Makefile created")
 
+	// create .gitignore
+  CreateFile(".gitignore", GetGitignoreContent())
+  log.Info(".gitignore created")
+
 	// create pkg directory
   CreateDir("pkg")
 	CreateDir("pkg/config")

@@ -19,6 +19,30 @@ func main() {
 `
 }
 
+func GetGitignoreContent() string {
+	return `
+# Created by https://www.toptal.com/developers/gitignore/api/go
+# Edit at https://www.toptal.com/developers/gitignore?templates=go
+
+### Go ###
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+bin/
+`
+}
+
 func GetMakefileContent(name string) string {
 	return fmt.Sprintf(`APP=%s
 GCO_ENABLED=0
