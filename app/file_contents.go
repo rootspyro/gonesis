@@ -2,21 +2,36 @@ package app
 
 import "fmt"
 
-func GetMainContent() string {
-	return `package main
+func GetMainContent(name string) string {
+	return fmt.Sprintf(`package main
 
 import (
-  "github.com/gofiber/fiber/v2"
+	"fmt"
+
+	"%s/src/api"
+	"%s/pkg/config"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/logger"
 )
 
 func main() {
-  app := fiber.New()
-  app.Get("/", func(c *fiber.Ctx) error {
-    return c.SendString("Hello, World!")
-  })
-  app.Listen(":3000")
+
+	app := fiber.New()
+
+	config.Setup()
+
+	app.Use(logger.New())
+
+	api.Setup(app)
+
+	appSocket := fmt.Sprintf("%%s:%%s", config.App.Host, config.App.Port)
+	if err := app.Listen(appSocket); err != nil {
+		log.Error(err)
+  }
 }
-`
+`, name, name)
 }
 
 func GetGitignoreContent() string {
@@ -40,6 +55,7 @@ func GetGitignoreContent() string {
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 bin/
+.env
 `
 }
 
@@ -48,19 +64,19 @@ func GetMakefileContent(name string) string {
 GCO_ENABLED=0
 GOOS=linux
 GOARCH=amd64
-MIGRATIONS_PATH = ./src/db/migrations
-PSQL_CONN = "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
+MIGRATIONS_PATH=./src/db/migrations
+PSQL_CONN="postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
 
 include .env
 
 run:
-	go run cmd/main.go
+	go run cmd/$(APP)/main.go
 
 build:
 	GCO_ENABLED=$(GCO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP) cmd/main.go
 
 start:
-  ./bin/$(APP)
+	./bin/$(APP)
 
 migration_create:
 	migrate create -ext sql -dir $(MIGRATIONS_PATH) -seq $(filename)
@@ -307,4 +323,92 @@ sql:
         out: "./src/repositories/%s_repo"
         sql_package: "pgx/v5"
 `, name, name, name, name)
+}
+
+func GetServiceContent() string {
+	return fmt.Sprintf(`package services
+type CommonSrv struct {}
+
+func NewCommonSrv() *CommonSrv {
+  return &CommonSrv{}
+}
+
+func (s *CommonSrv) GetEndpoints() map[string]string {
+	endpoints := map[string]string {
+  	"GET /": "Index page",	
+    "GET /health": "Health check",
+	}
+
+	return endpoints
+}
+`)
+} 
+
+func GetCommonPipesContent() string {
+	return fmt.Sprintf(`package common
+
+type IndexResponse struct {
+` + "\t" + `Message string ` + "`json:\"message\"`\n" +
+	"\t" + "Version string" + "`json:\"version\"`\n" +
+	"\t" + "Endpoints map[string]string" + "`json:\"endpoints\"`\n" +
+	"\t" + "Documentation string" + "`json:\"documentation\"`" + `
+}
+`)
+}
+
+func GetCommonHandler(name string) string {
+	return fmt.Sprintf(`package common
+
+import (
+	"%s/pkg/parser"
+	"%s/src/services"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+type Handler struct {
+	srv *services.CommonSrv
+}
+
+func New(services * services.CommonSrv) *Handler {
+	return &Handler{
+		srv : services,
+	}
+}
+
+func(h *Handler) Index(c *fiber.Ctx) error {
+	response := IndexResponse{
+  	Message: "Welcome to %s",	
+		Version: "v10.0.0",
+		Endpoints: h.srv.GetEndpoints(),
+		Documentation: "localhost:3000/docs",
+	}
+	return parser.OK(response, c)
+}
+`, name, name, name)
+}
+
+func GetAPIContent(name string) string {
+	return fmt.Sprintf(`package api
+
+import (
+	"%s/src/api/handlers/common"
+	"%s/src/services"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+func Setup(app *fiber.App) {
+
+	// services
+	commonSrv := services.NewCommonSrv()
+
+	// handlers
+	commonH := common.New(commonSrv)
+
+  // routes
+  app.Get("/", commonH.Index)
+
+}
+`, name, name)
 }

@@ -28,6 +28,7 @@ func CreateProject(name string) {
 
 	// create .env.example
 	CreateFile(".env.example", GetEnvContent(name))
+	RunCommand("cp", []string{".env.example", ".env"})
   log.Info(".env.example created")
 
 	// create Makefile
@@ -54,24 +55,32 @@ func CreateProject(name string) {
   CreateFile("pkg/config/config.go", GetConfigContent(name))
   log.Info("config.go created")
 
-	// create db directory
-  CreateDir("db")
-  CreateDir("db/migrations")
-	CreateDir("db/sqlc")
-	CreateDir("db/sqlc/" + name)
-
-	CreateFile("db/sqlc/" + name + "/query.sql", "")
-	CreateFile("db/sqlc/" + name + "/schema.sql", "")
-	
-	log.Info("db directory created")
-
 	// create src directory
   CreateDir("src")
+
+	// create db directory
+  CreateDir("src/db")
+  CreateDir("src/db/migrations")
+	CreateDir("src/db/sqlc")
+	CreateDir("src/db/sqlc/" + name)
+
+	CreateFile("src/db/sqlc/" + name + "/query.sql", "")
+	CreateFile("src/db/sqlc/" + name + "/schema.sql", "")
+	
   CreateDir("src/repositories")
-	CreateDir("src/api")
 	CreateDir("src/services")
 
-	CreateFile("src/api/routes.go", "")
+	CreateFile("src/services/commong.srv.go", GetServiceContent())
+
+	CreateDir("src/api")
+
+	CreateDir("src/api/handlers")
+	CreateDir("src/api/handlers/common")
+
+	CreateFile("src/api/handlers/common/pipes.go", GetCommonPipesContent())
+	CreateFile("src/api/handlers/common/handler.go", GetCommonHandler(name))
+
+	CreateFile("src/api/routes.go", GetAPIContent(name))
 
   log.Info("src directory created")
 
@@ -80,7 +89,7 @@ func CreateProject(name string) {
 	CreateDir("cmd/" + name)
 
 	// create main.go
-  CreateFile("cmd/" + name + "/main.go", GetMainContent())
+  CreateFile("cmd/" + name + "/main.go", GetMainContent(name))
   log.Info("main.go created")
 
 	// go mod tidy
