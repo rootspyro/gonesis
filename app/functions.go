@@ -38,6 +38,10 @@ func CreateProject(name string) {
   CreateFile(".gitignore", GetGitignoreContent())
   log.Info(".gitignore created")
 
+	// create sqlc.yaml
+  CreateFile("sqlc.yaml", GetSQLCContent(name))
+  log.Info("sqlc.yaml created")
+
 	// create pkg directory
   CreateDir("pkg")
 	CreateDir("pkg/config")
@@ -45,7 +49,17 @@ func CreateProject(name string) {
   // create config.go
   CreateFile("pkg/config/config.go", GetConfigContent(name))
   log.Info("config.go created")
+
+	// create db directory
+  CreateDir("db")
+  CreateDir("db/migrations")
+	CreateDir("db/sqlc")
+	CreateDir("db/sqlc/" + name)
+
+	CreateFile("db/sqlc/" + name + "/query.sql", "")
+	CreateFile("db/sqlc/" + name + "/schema.sql", "")
 	
+	log.Info("db directory created")
 
 	// create cmd directory
 	CreateDir("cmd")

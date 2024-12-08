@@ -48,6 +48,8 @@ func GetMakefileContent(name string) string {
 GCO_ENABLED=0
 GOOS=linux
 GOARCH=amd64
+MIGRATIONS_PATH = ./src/db/migrations
+PSQL_CONN = "postgresql://$(DB_USER):$(DB_PASSWORD)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)?sslmode=disable"
 
 include .env
 
@@ -59,6 +61,18 @@ build:
 
 start:
   ./bin/$(APP)
+
+migration_create:
+	migrate create -ext sql -dir $(MIGRATIONS_PATH) -seq $(filename)
+
+migration_up:
+	migrate -path $(MIGRATIONS_PATH) -database $(PSQL_CONN) -verbose up
+
+migration_down:
+	migrate -path $(MIGRATIONS_PATH) db/migrations -database $(PSQL_CONN) -verbose down 1
+
+migration_fix:
+	migrate -path $(MIGRATIONS_PATH) -database $(PSQL_CONN) -verbose fix $(version)
 `, name)
 }
 
@@ -124,4 +138,18 @@ DB_USER="postgres"
 DB_PASSWORD="postgres"
 DB_NAME="postgres"
 `, name)
+}
+
+func GetSQLCContent(name string) string {
+	return fmt.Sprintf(`version: "2"
+sql:
+  - engine: "postgresql"
+    queries: "./src/db/sqlc/%s/query.sql"
+    schema: "./src/db/sqlc/%s/schema.sql"
+    gen:
+      go:
+        package: "%srepo"
+        out: "./src/repositories/%s_repo"
+        sql_package: "pgx/v5"
+`, name, name, name, name)
 }
