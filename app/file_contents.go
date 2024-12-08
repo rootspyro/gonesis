@@ -19,8 +19,29 @@ func main() {
 `
 }
 
+func GetMakefileContent(name string) string {
+	return fmt.Sprintf(`APP=%s
+GCO_ENABLED=0
+GOOS=linux
+GOARCH=amd64
+
+include .env
+
+run:
+	go run cmd/main.go
+
+build:
+	GCO_ENABLED=$(GCO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP) cmd/main.go
+
+start:
+  ./bin/$(APP)
+`, name)
+}
+
 func GetConfigContent(name string) string {
 	return fmt.Sprintf(`package config
+
+import "os"
 
 type app struct {
 	Name    string

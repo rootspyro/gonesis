@@ -30,9 +30,17 @@ func CreateProject(name string) {
 	CreateFile(".env.example", GetEnvContent(name))
   log.Info(".env.example created")
 
+	// create Makefile
+  CreateFile("Makefile", GetMakefileContent(name))
+  log.Info("Makefile created")
+
 	// create pkg directory
   CreateDir("pkg")
 	CreateDir("pkg/config")
+
+  // create config.go
+  CreateFile("pkg/config/config.go", GetConfigContent(name))
+  log.Info("config.go created")
 	
 
 	// create cmd directory
