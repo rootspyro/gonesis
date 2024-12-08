@@ -125,6 +125,161 @@ func readEnv(key, defaultValue string) string {
 `, name)
 }
 
+func GetPerserContent(name string) string {
+	return fmt.Sprintf(`package parser
+
+import (
+	"net/http"
+	"time"
+
+	"github.com/gofiber/fiber/v2"
+)
+
+// ---------------------
+// 		RESPONSE STRUCTS
+// ---------------------
+type statusResponse struct {
+  success string 
+	error   string
+}` +
+ "\n type response struct {\n" + 
+ "\tStatus string `json:\"status\"`\n" + 
+ "\tStatusCode int `json:\"statusCode\"`\n" + 
+ "\tData any `json:\"data\"`\n" + 
+ "}\n" + 
+ "\n type errorResponse struct {\n" + 
+ "\tStatus string `json:\"status\"`\n" + 
+ "\tStatusCode int `json:\"statusCode\"`\n" + 
+ "\tError errorItem `json:\"error\"`\n" + 
+ "}\n" + 
+ "\n type errorItem struct {\n" + 
+ "\tCode string `json:\"code\"`\n" + 
+ "\tMessage string `json:\"message\"`\n" + 
+ "\tDetails any `json:\"details\"`\n" + 
+ "\tTimestamp time.Time `json:\"timestamp\"`\n" + 
+ "\tPath string `json:\"path\"`\n" + 
+ "}\n" + `
+
+// ---------------------
+// 		STATUS CODES	
+// ---------------------
+
+var status = statusResponse{
+  success: "success",
+  error:   "error",
+}
+
+// ---------------------
+// 		  FUNCTIONS 
+// ---------------------
+
+func jsonFormatter(statusCode int, data any, c *fiber.Ctx) error {
+  return c.Status(statusCode).JSON(response{
+    Status: status.success,
+    StatusCode: statusCode,
+    Data: data,
+  })
+}
+
+func errorFormatter(statusCode int, error errorItem, c *fiber.Ctx) error {
+  return c.Status(statusCode).JSON(errorResponse{
+    Status: status.error,
+    StatusCode: statusCode,
+    Error: error,
+  })
+}
+
+// OK - 200
+func OK(data any, c *fiber.Ctx) error {
+  return jsonFormatter(http.StatusOK, data, c)
+}
+
+// Created - 201
+func Created(data any, c *fiber.Ctx) error {
+  return jsonFormatter(http.StatusCreated, data, c)
+}
+
+// BAD REQUEST - 400
+func BadRequest(data any, c *fiber.Ctx) error {
+  errorResponse := errorItem{
+    Code: "BAD_REQUEST",
+		Message: "Invalid request. Please check your request parameters and try again.",
+    Details: data,
+    Timestamp: timestamp(),
+    Path: c.Path(),
+  }
+  return errorFormatter(http.StatusBadRequest, errorResponse, c)
+}
+
+// UNAUTHORIZED - 401
+func Unauthorized(data any, c *fiber.Ctx) error {
+  errorResponse := errorItem{
+    Code: "UNAUTHORIZED",
+    Message: "Authentication failed. Please check your credentials and try again.",
+    Details: data,
+    Timestamp: timestamp(),
+    Path: c.Path(),
+  }
+  return errorFormatter(http.StatusUnauthorized, errorResponse, c)
+}
+
+// FORBIDDEN - 403
+func Forbidden(data any, c *fiber.Ctx) error {
+  errorResponse := errorItem{
+    Code: "FORBIDDEN",
+    Message: "Access denied. You do not have permission to access this resource.",
+    Details: data,
+		Timestamp: timestamp(),
+    Path: c.Path(),
+  }
+  return errorFormatter(http.StatusForbidden, errorResponse, c)
+}
+
+// NOT FOUND - 404
+func NotFound(data any, c *fiber.Ctx) error {
+	errorResponse := errorItem{
+    Code: "NOT_FOUND",
+    Message: "Resource not found. The requested resource could not be located.",
+    Details: data,
+    Timestamp: timestamp(),
+    Path: c.Path(),
+  }
+  return errorFormatter(http.StatusNotFound, errorResponse, c)
+}
+
+// CONFLICT - 409
+func Conflict(data any, c *fiber.Ctx) error {
+  errorResponse := errorItem{
+    Code: "CONFLICT",
+    Message: "Conflict. The request cannot be processed due to a conflict with the current state of the resource.",
+    Details: data,
+    Timestamp: timestamp(),
+    Path: c.Path(),
+  }
+  return errorFormatter(http.StatusConflict, errorResponse, c)
+}
+
+// INTERNAL SERVER ERROR - 500
+func InternalServerError(data any, c *fiber.Ctx) error {
+  errorResponse := errorItem{
+    Code: "INTERNAL_SERVER_ERROR",
+    Message: "An unexpected error occurred while processing your request.",
+    Details: data,
+    Timestamp: timestamp(),
+    Path: c.Path(),
+  }
+  return errorFormatter(http.StatusInternalServerError, errorResponse, c)
+}
+
+// ---------------------
+// 				UTILS 
+// ---------------------
+func timestamp() time.Time {
+  return time.Now().Local()
+}
+`)
+}
+
 func GetEnvContent(name string) string {
   return fmt.Sprintf(`
 APP_NAME="%s"

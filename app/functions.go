@@ -45,6 +45,10 @@ func CreateProject(name string) {
 	// create pkg directory
   CreateDir("pkg")
 	CreateDir("pkg/config")
+	CreateDir("pkg/parser")
+
+	CreateFile("pkg/parser/parser.go", GetPerserContent(name))
+  log.Info("parser.go created")
 
   // create config.go
   CreateFile("pkg/config/config.go", GetConfigContent(name))
@@ -60,6 +64,16 @@ func CreateProject(name string) {
 	CreateFile("db/sqlc/" + name + "/schema.sql", "")
 	
 	log.Info("db directory created")
+
+	// create src directory
+  CreateDir("src")
+  CreateDir("src/repositories")
+	CreateDir("src/api")
+	CreateDir("src/services")
+
+	CreateFile("src/api/routes.go", "")
+
+  log.Info("src directory created")
 
 	// create cmd directory
 	CreateDir("cmd")
