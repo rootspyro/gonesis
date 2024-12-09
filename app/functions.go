@@ -61,6 +61,7 @@ func CreateProject(name string) {
 
 	// create db directory
   CreateDir("src/db")
+	CreateFile("src/db/conn.go", GetDBConnContent(name))
   CreateDir("src/db/migrations")
 	CreateDir("src/db/sqlc")
 	CreateDir("src/db/sqlc/" + name)

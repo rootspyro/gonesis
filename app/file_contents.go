@@ -73,7 +73,7 @@ run:
 	go run cmd/$(APP)/main.go
 
 build:
-	GCO_ENABLED=$(GCO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP) cmd/main.go
+	GCO_ENABLED=$(GCO_ENABLED) GOOS=$(GOOS) GOARCH=$(GOARCH) go build -o bin/$(APP) cmd/$(APP)/main.go
 
 start:
 	./bin/$(APP)
@@ -85,10 +85,10 @@ migration_up:
 	migrate -path $(MIGRATIONS_PATH) -database $(PSQL_CONN) -verbose up
 
 migration_down:
-	migrate -path $(MIGRATIONS_PATH) db/migrations -database $(PSQL_CONN) -verbose down 1
+	migrate -path $(MIGRATIONS_PATH) -database $(PSQL_CONN) -verbose down 1
 
 migration_fix:
-	migrate -path $(MIGRATIONS_PATH) -database $(PSQL_CONN) -verbose fix $(version)
+	migrate -path $(MIGRATIONS_PATH) -database $(PSQL_CONN) -verbose force $(version)
 `, name)
 }
 
@@ -297,8 +297,7 @@ func timestamp() time.Time {
 }
 
 func GetEnvContent(name string) string {
-  return fmt.Sprintf(`
-APP_NAME="%s"
+  return fmt.Sprintf(`APP_NAME="%s"
 APP_VERSION="1.0.0"
 APP_HOST="localhost"
 APP_PORT="3000"
@@ -392,13 +391,27 @@ func GetAPIContent(name string) string {
 	return fmt.Sprintf(`package api
 
 import (
+	"context"
+	"os"
+
 	"%s/src/api/handlers/common"
+	"%s/src/db"
 	"%s/src/services"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 func Setup(app *fiber.App) {
+
+	// db
+	pool := db.New()
+	defer pool.Close()
+
+	if err := pool.Ping(context.Background()); err != nil {
+    log.Error(err)
+    os.Exit(1)
+  }
 
 	// services
 	commonSrv := services.NewCommonSrv()
@@ -410,5 +423,38 @@ func Setup(app *fiber.App) {
   app.Get("/", commonH.Index)
 
 }
-`, name, name)
+`,name, name, name)
+}
+
+func GetDBConnContent(name string) string {
+	return fmt.Sprintf(`package db
+
+import (
+	"context"
+	"fmt"
+	"%s/pkg/config"
+	"os"
+
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func New() *pgxpool.Pool {
+	url := fmt.Sprintf("postgres://%%s:%%s@%%s:%%s/%%s",
+		config.Database.User,
+		config.Database.Password,
+		config.Database.Host,
+		config.Database.Port,
+		config.Database.Name,
+	)
+
+	pool, err := pgxpool.New(context.Background(), url)
+  if err != nil {
+		log.Error(err)
+		os.Exit(1)
+  }
+
+	return pool
+}
+`, name)
 }
