@@ -12,7 +12,7 @@ BuildBinary() {
   # $1 = arch
   # $2 = os 
 
-  GCO_ENABLED=0 GOARCH=$1 GOOS=$2 go build  -o $binName cmd/$binName/main.go
+  GCO_ENABLED=0 GOARCH=$1 GOOS=$2 go build -ldflags "-X main.version=$version" -o $binName cmd/$binName/main.go
   local tarName=$binName\_$2\_$1.tar.gz
 
   tar -czvf $tarName $binName
