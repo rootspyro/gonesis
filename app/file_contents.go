@@ -95,7 +95,11 @@ migration_fix:
 func GetConfigContent(name string) string {
 	return fmt.Sprintf(`package config
 
-import "os"
+import(
+	"os"
+
+  "github.com/joho/godotenv"
+)
 
 type app struct {
 	Name    string
@@ -116,6 +120,7 @@ var App = app{}
 var Database = db{}
 
 func Setup() {
+	godotenv.Load()
 	App.Name = readEnv("APP_NAME", "%s")
 	App.Version = readEnv("APP_VERSION", "1.0.0")
 	App.Host = readEnv("APP_HOST", "localhost")
