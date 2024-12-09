@@ -4,7 +4,7 @@ source .env
 
 binName=gonesis
 builds=dist
-version=$APP_VERSION
+version=$(git describe --tags --abbrev=0)
 checksumsName=$binName\_$version\_checksums.txt
 
 

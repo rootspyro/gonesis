@@ -7,13 +7,12 @@ import (
 	"github.com/rootspyro/gonesis/app"
 	f "github.com/rootspyro/gonesis/cmd/flags"
 	"github.com/rootspyro/gonesis/pkg/colors"
-	"github.com/rootspyro/gonesis/pkg/config"
 	"github.com/rootspyro/gonesis/pkg/log"
 )
 
-func main() {
+var version string
 
-	config.Setup()
+func main() {
 
 	fmt.Printf(colors.Bold + `
    ____ _ ____   ____   ___   _____ (_)_____
@@ -23,9 +22,9 @@ func main() {
 /____/                                      
 
 ` +
-"\n" + colors.Green +  " • " + colors.Reset + colors.Bold + "Version:" + colors.Cyan + " " + config.App.Version + colors.Reset +
-"\n" + colors.Green +  " • " + colors.Reset + colors.Bold + "Author:" + colors.Cyan + " " + config.App.Author + colors.Reset +
-"\n" + colors.Green +  " • " + colors.Reset + colors.Bold + "Github:" + colors.Cyan + " " + config.App.Github + colors.Reset + "\n\n",
+"\n" + colors.Green +  " • " + colors.Reset + colors.Bold + "Version:" + colors.Cyan + " " + version + colors.Reset +
+"\n" + colors.Green +  " • " + colors.Reset + colors.Bold + "Author:" + colors.Cyan + " Spyridon Mihalopoulos" + colors.Reset +
+"\n" + colors.Green +  " • " + colors.Reset + colors.Bold + "Github:" + colors.Cyan + " https://github.com/rootspyro/gonesis" + colors.Reset + "\n\n",
 )
 
 	flags := f.ParseFlags()
