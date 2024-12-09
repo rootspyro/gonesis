@@ -37,7 +37,7 @@ func main() {
 
 		log.Success("Project created!\n")
 
-		fmt.Println(colors.Green +  " • " + colors.Reset + "Run " + colors.Cyan + "cd " + flags.NewProject + colors.Reset + " and " + colors.Cyan + "make run" + colors.Reset + " to start the server.\n")
+		fmt.Println(colors.Green +  " • " + colors.Reset + "Run " + colors.Cyan + colors.Bold + "cd " + flags.NewProject + colors.Reset + " and " + colors.Cyan + colors.Bold + "make run" + colors.Reset + " to start the server.\n")
 
 		os.Exit(0)
   }

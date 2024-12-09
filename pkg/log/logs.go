@@ -7,13 +7,13 @@ import (
 )
 
 func Info(msg string) {
-	fmt.Println(colors.Cyan,"[INFO] ", colors.Reset, msg)
+	fmt.Println(colors.Cyan + colors.Bold ,"[INFO] ", colors.Reset, msg)
 }
 
 func Error(msg string) {
-  fmt.Println(colors.Red,"[ERROR] ", colors.Reset, msg)
+  fmt.Println(colors.Red + colors.Bold ,"[ERROR] ", colors.Reset, msg)
 }
 
 func Success(msg string) {
-  fmt.Println(colors.Green,"[SUCCESS] ", colors.Reset, msg)
+  fmt.Println(colors.Green + colors.Bold ,"[SUCCESS] ", colors.Reset, msg)
 }
