@@ -44,6 +44,11 @@ func CreateProject(name string) {
   CreateFile("sqlc.yaml", GetSQLCContent(name))
   log.Info("sqlc.yaml created")
 
+	// create dockerfile
+  CreateFile("Dockerfile", GetDockerfileContent(name))
+	CreateFile(".dockerignore", GetDockerIgnoreContent())
+  log.Info("Dockerfile created")
+
 	// create pkg directory
   CreateDir("pkg")
 	CreateDir("pkg/config")

@@ -463,3 +463,59 @@ func New() *pgxpool.Pool {
 }
 `, name)
 }
+
+func GetDockerfileContent(name string) string {
+	return fmt.Sprintf(`# Stage 1: Build stage 
+FROM golang:1.23 AS build
+
+WORKDIR /src
+
+# Download dependencies
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the source code
+COPY . .
+
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o %s ./cmd/%s/main.go
+
+# Stage 2: Final stage
+FROM alpine:latest
+
+WORKDIR /app
+
+# Copy the binary from the build stage
+COPY --from=build /src/%s .
+
+# Set the timezone and install CA certificates
+RUN apk --no-cache add ca-certificates tzdata
+
+# Set environment variables
+ENV APP_NAME="%s"
+ENV APP_VERSION="1.0.0"
+ENV APP_HOST="0.0.0.0"
+ENV APP_PORT="3000"
+ENV DB_HOST=
+ENV DB_PORT=
+ENV DB_USER=
+ENV DB_PASSWORD=
+ENV DB_NAME=
+
+EXPOSE 3000
+
+CMD ["./%s"]
+`, name, name, name, name, name)
+}
+
+func GetDockerIgnoreContent() string {
+	return fmt.Sprintln(`.env
+.env.example
+.git
+.gitignore
+Makefile
+README.md
+build
+dist
+	`)
+}
