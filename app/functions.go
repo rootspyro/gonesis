@@ -19,7 +19,7 @@ func CreateProject(name string) {
 	log.Info("Go mod initialized")
 
 	// create README.md
-  CreateFile("README.md", "# " + name)
+  CreateFile("README.md", GetREADMEContent(name))
 	log.Info("README.md created")
 
 	// create Makefile
