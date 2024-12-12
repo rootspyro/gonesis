@@ -1,4 +1,6 @@
 # Gonesis
+![gonesis](https://github.com/user-attachments/assets/ba357b51-7c84-4a96-8d4e-3921d8ef1ff6)
+
 
 Terminal tool to generate a boilerplate for a Golang backend projects with the technology stack:
 
@@ -23,7 +25,7 @@ Gonesis is a terminal tool based on my backend technology stack with Golang. It 
 
 ## Installation
 
-You download the latest version of Gonesis from the [releases]((https://github.com/rootspyro/gonesis/releases).
+You download the latest version of Gonesis from the [releases](https://github.com/rootspyro/gonesis/releases).
 
 To install it in a `linux` system, run the following command:
 
